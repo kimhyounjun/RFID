@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <script>
+      const API_BASE_URL = "https://walton-wharfless-lanie.ngrok-free.dev";
+      const LOCAL_API_URL = "http://192.168.219.107:5000";
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상품 삭제</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", "Noto Sans KR", sans-serif;
+      }
+
+      .bg-abstract {
+        background-color: #f0f4f9;
+        background-image:
+          radial-gradient(at 100% 100%, #e2eaf4 0px, transparent 50%),
+          radial-gradient(at 0% 0%, #e8f0f8 0px, transparent 50%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .abstract-shape {
+        position: absolute;
+        background: rgba(180, 204, 232, 0.5);
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: -1;
+      }
+
+      .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
+      .shape-2 { width: 400px; height: 400px; bottom: -100px; right: -50px; }
+      .shape-3 { width: 300px; height: 300px; top: 15%; right: 15%; }
+      .shape-4 { width: 250px; height: 250px; bottom: 20%; left: 5%; }
+    </style>
+  </head>
+
+  <body class="bg-abstract text-gray-900 flex items-center justify-center min-h-screen">
+
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
+    <div class="abstract-shape shape-3"></div>
+    <div class="abstract-shape shape-4"></div>
+
+    <div class="w-full max-w-md p-6 bg-white/80 rounded-xl shadow-lg backdrop-blur">
+
+      <h1 class="text-3xl font-bold text-center mb-4">상품 삭제</h1>
+
+      <p class="text-center text-sm text-gray-600 mb-4">
+        상품을 찍어주세요.
+      </p>
+
+      <!-- 리스트 -->
+      <div id="item-list" class="space-y-3 mb-6 min-h-[100px]"></div>
+
+      <!-- 총합 -->
+      <div class="flex justify-between mb-6">
+        <span class="font-bold">총 합계</span>
+        <span id="total-price">₩0</span>
+      </div>
+
+      <!-- 전체 삭제 -->
+      <button id="btn-pay"
+        class="w-full h-12 bg-blue-500 hover:bg-blue-400 text-white rounded font-bold">
+        전체상품제거
+      </button>
+
+      <!-- 뒤로가기 -->
+      <a href="startsf.html"
+        class="block text-center mt-4 underline text-gray-300 hover:text-white">
+        언어 선택으로 돌아가기
+      </a>
+
+    </div>
+
+    <script>
+      const listEl = document.getElementById("item-list");
+      const totalEl = document.getElementById("total-price");
+      const payButton = document.getElementById("btn-pay");
+
+      const scannedTagSet = new Set();
+      const scannedItems = [];
+      const cart = [];
+
+      function renderCart() {
+        if (!cart.length) {
+          listEl.innerHTML =
+            '<p class="text-sm text-gray-400">상품이 없습니다.</p>';
+          totalEl.textContent = "₩0";
+          return;
+        }
+
+        listEl.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item, index) => {
+          total += item.price;
+
+          const row = document.createElement("div");
+          row.className =
+            "flex justify-between items-center bg-white/10 p-3 rounded";
+
+          row.innerHTML = `
+            <div>
+              <div class="text-xs text-gray-400">태그: ${item.tag_id}</div>
+              <div>${item.name}</div>
+              <div>₩${item.price.toLocaleString()}</div>
+            </div>
+
+            <button onclick="removeItem(${index})"
+              class="bg-red-500 px-2 py-1 rounded text-xs">
+              ✕
+            </button>
+          `;
+
+          listEl.appendChild(row);
+        });
+
+        totalEl.textContent = "₩" + total.toLocaleString();
+      }
+
+      function addToCart(product, tagId) {
+        const name = product.product_name || product.name;
+        const price = Number(product.price);
+
+        // ❗ 미등록 / 이상 데이터 필터
+        if (!name || !price) {
+          console.log("❌ 잘못된 상품 데이터 무시:", product);
+          return;
+        }
+
+        scannedItems.push({ tag_id: tagId, name, price });
+        cart.push({ tag_id: tagId, name, price });
+
+        renderCart();
+      }
+
+      function removeItem(index) {
+        const removed = cart.splice(index, 1)[0];
+
+        const i = scannedItems.findIndex(
+          (item) => item.tag_id === removed.tag_id
+        );
+        if (i !== -1) scannedItems.splice(i, 1);
+
+        renderCart();
+      }
+
+      async function fetchProductForTag(tagId) {
+        try {
+          const resp = await fetch(API_BASE_URL + "/scan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ rfid: tagId }),
+          });
+
+          if (!resp.ok) return;
+
+          const result = await resp.json();
+
+          if (result.product) {
+            addToCart(result.product, tagId);
+          } 
+          else if (result && (result.name || result.product_name) && result.price) {
+            addToCart(result, tagId);
+          } 
+          else {
+            console.log("❌ 등록되지 않은 태그:", tagId);
+          }
+
+        } catch (e) {
+          console.error("태그 처리 오류:", e);
+        }
+      }
+
+      async function pollTags() {
+        try {
+          const resp = await fetch(LOCAL_API_URL + "/tags");
+          const data = await resp.json();
+
+          const tags = data.tags || [];
+
+          for (const tagId of tags) {
+            if (!scannedTagSet.has(tagId)) {
+              scannedTagSet.add(tagId);
+              fetchProductForTag(tagId);
+            }
+          }
+        } catch (e) {}
+
+        setTimeout(pollTags, 200);
+      }
+
+      async function startScan() {
+        try {
+          await fetch(LOCAL_API_URL + "/scan/start", { method: "POST" });
+        } catch (e) {}
+
+        pollTags();
+      }
+
+      function stopScanBeacon() {
+        navigator.sendBeacon(LOCAL_API_URL + "/scan/stop");
+      }
+
+      window.addEventListener("beforeunload", stopScanBeacon);
+
+      async function handlePayment() {
+        if (!scannedItems.length) {
+          alert("상품이 없습니다.");
+          return;
+        }
+
+        if (!confirm("전체 상품을 삭제하시겠습니까?")) return;
+
+        const tagIds = scannedItems.map((i) => i.tag_id);
+
+        await fetch(API_BASE_URL + "/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tag_ids: tagIds }),
+        });
+
+        stopScanBeacon();
+
+        alert("상품 제거 완료");
+
+        // 초기화
+        scannedItems.length = 0;
+        cart.length = 0;
+        scannedTagSet.clear();
+
+        renderCart();
+      }
+
+      payButton.addEventListener("click", handlePayment);
+
+      renderCart();
+      startScan();
+    </script>
+  </body>
+</html>

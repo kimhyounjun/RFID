@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>구매 영수증 - Convenience Store</title>
+
+    <script>
+      const API_BASE_URL = "https://walton-wharfless-lanie.ngrok-free.dev";
+      const PAGE_SIZE = 4; // 페이지당 4개씩 표시
+    </script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#f2460d",
+              "background-light": "#f8f6f5",
+              "background-dark": "#221410",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .receipt-box {
+        background: rgba(255, 255, 255, 0.94);
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px dashed #777;
+        max-width: 360px;
+        font-family: "Courier New", monospace;
+      }
+
+       .bg-abstract {
+        background-color: #f0f4f9;
+        background-image:
+          radial-gradient(at 100% 100%, #e2eaf4 0px, transparent 50%),
+          radial-gradient(at 0% 0%, #e8f0f8 0px, transparent 50%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .abstract-shape {
+        position: absolute;
+        background: rgba(180, 204, 232, 0.5);
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: -1;
+      }
+
+      .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
+      .shape-2 { width: 400px; height: 400px; bottom: -100px; right: -50px; }
+      .shape-3 { width: 300px; height: 300px; top: 15%; right: 15%; }
+      .shape-4 { width: 250px; height: 250px; bottom: 20%; left: 5%; }
+    </style>
+  </head>
+
+  <body class="bg-abstract font-display">
+
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
+    <div class="abstract-shape shape-3"></div>
+    <div class="abstract-shape shape-4"></div>
+
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+
+      <!-- 메인 컨텐츠 -->
+      <div class="relative flex flex-1 items-center justify-center p-4 md:p-8">
+        <div
+          class="w-full max-w-4xl rounded-xl bg-background-light/80 dark:bg-background-dark/80 shadow-2xl backdrop-blur-lg p-6 md:p-10"
+        >
+          <h1
+            class="text-3xl md:text-4xl font-extrabold text-center text-gray-100 mb-8"
+          >
+            🧾 구매 영수증
+          </h1>
+
+          <!-- 날짜 선택 + 검색 -->
+          <section
+            class="mb-6 flex flex-row items-center gap-2 justify-center flex-wrap"
+          >
+          <div class="flex flex-col items-center">
+            <span class="text-xs text-gray-200 mb-1">날짜 선택</span>
+            <input
+              id="search-date"
+              type="date"
+              class="rounded-lg border border-gray-300 bg-white/90 px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+            <button
+              id="btn-search-date"
+              class="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600"
+            >
+              검색
+            </button>
+            <button
+              id="btn-reset-date"
+              class="bg-gray-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-600"
+            >
+              초기화
+            </button>
+          </section>
+
+          <p id="filter-info" class="text-center text-gray-200 text-sm mb-6">
+            전체 영수증 기준으로 표시 중입니다.
+          </p>
+
+          <hr class="border-gray-500 my-6" />
+
+          <!-- 영수증 리스트: 항상 중앙 정렬 -->
+          <section>
+            <div
+              id="receipt-list"
+              class="flex flex-wrap justify-center items-start gap-6 min-h-[200px] max-h-[500px] overflow-y-auto"
+            >
+              <p id="receipt-loading-text" class="text-gray-200">
+                영수증을 불러오는 중입니다.
+              </p>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="mt-8 flex justify-center gap-4 items-center">
+              <button
+                id="btn-prev-page"
+                class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-sm hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-30"
+              >
+                ◀ 이전
+              </button>
+
+              <span id="page-info" class="text-gray-100 text-sm"
+                >페이지 1</span
+              >
+
+              <button
+                id="btn-next-page"
+                class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-sm hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-30"
+              >
+                다음 ▶
+              </button>
+            </div>
+          </section>
+
+          <!-- 뒤로가기 -->
+          <div class="mt-10 text-center">
+            <a
+              href="check.html"
+              class="bg-blue-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-600 shadow-md"
+            >
+              재고 확인으로 돌아가기
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const receiptList = document.getElementById("receipt-list");
+        const loadingText = document.getElementById("receipt-loading-text");
+
+        const searchDateInput = document.getElementById("search-date");
+        const searchDateButton = document.getElementById("btn-search-date");
+        const resetDateButton = document.getElementById("btn-reset-date");
+        const filterInfo = document.getElementById("filter-info");
+
+        const prevBtn = document.getElementById("btn-prev-page");
+        const nextBtn = document.getElementById("btn-next-page");
+        const pageInfo = document.getElementById("page-info");
+
+        let currentPage = 1;
+        let currentDateFilter = "";
+
+        function formatCurrency(n) {
+          return "₩" + Number(n || 0).toLocaleString();
+        }
+
+        // ✅ 추가 보정 없이, 그냥 한국 시간대로 표시
+        function formatDateTime(iso) {
+          if (!iso) return "";
+          const d = new Date(iso);
+          return d.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
+        }
+
+        function createReceiptBox(rec) {
+          const div = document.createElement("div");
+          div.className = "receipt-box shadow-xl";
+
+          let items = "";
+          (rec.items || []).forEach((i) => {
+            items += `<div class="flex justify-between text-sm">
+                        <span>${i.name} × ${i.qty}</span>
+                        <span>${formatCurrency(i.unit_price * i.qty)}</span>
+                      </div>`;
+          });
+
+          div.innerHTML = `
+            <h2 class="text-lg font-bold text-center mb-2">편의점 영수증</h2>
+            <div class="text-xs text-gray-700 mb-3">
+              구매 시간: ${formatDateTime(rec.purchased_at)}
+            </div>
+            <hr class="border-gray-300 my-2" />
+            ${items}
+            <hr class="border-gray-300 my-2" />
+            <div class="flex justify-between font-bold text-base">
+              <span>Total</span>
+              <span>${formatCurrency(rec.total_price)}</span>
+            </div>
+          `;
+          return div;
+        }
+
+        function updatePagination(hasNextPage) {
+          pageInfo.textContent = `페이지 ${currentPage}`;
+          prevBtn.disabled = currentPage <= 1;
+          nextBtn.disabled = !hasNextPage;
+        }
+
+        async function loadPage() {
+          receiptList.innerHTML = '<p class="text-gray-200">로딩 중.</p>';
+
+          const params = new URLSearchParams({
+            page: currentPage,
+            size: PAGE_SIZE,
+          });
+          if (currentDateFilter) params.set("date", currentDateFilter);
+
+          try {
+            const resp = await fetch(
+              `${API_BASE_URL}/purchase-history?${params.toString()}`,
+              {
+                headers: { "ngrok-skip-browser-warning": "1" },
+              }
+            );
+
+            if (!resp.ok) {
+              throw new Error("서버 오류");
+            }
+
+            const data = await resp.json();
+
+            // 현재 main.py는 리스트 그대로 반환하므로, 그대로 사용
+            const pageItems = Array.isArray(data)
+              ? data
+              : Array.isArray(data.items)
+              ? data.items
+              : [];
+
+            receiptList.innerHTML = "";
+
+            if (!pageItems.length) {
+              receiptList.innerHTML =
+                '<p class="text-gray-200 text-sm">영수증이 없습니다.</p>';
+              updatePagination(false);
+              return;
+            }
+
+            pageItems.forEach((r) =>
+              receiptList.appendChild(createReceiptBox(r))
+            );
+
+            // 다음 페이지가 있는지는 "이번에 PAGE_SIZE개 꽉 찼냐"로 판단
+            const hasNextPage = pageItems.length === PAGE_SIZE;
+            updatePagination(hasNextPage);
+          } catch (e) {
+            console.error(e);
+            receiptList.innerHTML =
+              '<p class="text-red-200 text-sm">영수증을 불러오지 못했습니다.</p>';
+            updatePagination(false);
+          }
+        }
+
+        // 날짜 검색
+        searchDateButton.addEventListener("click", () => {
+          currentDateFilter = searchDateInput.value || "";
+          currentPage = 1;
+          filterInfo.textContent = currentDateFilter
+            ? `${currentDateFilter} 기준으로 표시 중입니다.`
+            : "전체 영수증 기준으로 표시 중입니다.";
+          loadPage();
+        });
+
+        // 날짜 초기화
+        resetDateButton.addEventListener("click", () => {
+          searchDateInput.value = "";
+          currentDateFilter = "";
+          currentPage = 1;
+          filterInfo.textContent = "전체 영수증 기준으로 표시 중입니다.";
+          loadPage();
+        });
+
+        // 이전 페이지
+        prevBtn.addEventListener("click", () => {
+          if (currentPage <= 1) return;
+          currentPage--;
+          loadPage();
+        });
+
+        // 다음 페이지
+        nextBtn.addEventListener("click", () => {
+          currentPage++;
+          loadPage();
+        });
+
+        // 첫 로딩
+        loadPage();
+      });
+    </script>
+  </body>
+</html>

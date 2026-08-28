@@ -1,0 +1,61 @@
+@host = https://walton-wharfless-lanie.ngrok-free.dev
+
+### 1) 헬스 체크
+GET {{host}}/health
+ngrok-skip-browser-warning: 1
+
+### 2) (기존) 상품 목록
+GET {{host}}/products
+ngrok-skip-browser-warning: 1
+
+### 3) ✅ 수량 포함 상품 목록 (in_stock 기준)
+GET {{host}}/products-with-qty
+ngrok-skip-browser-warning: 1
+
+### 4) ✅ 신규 상품 생성 + 초기 태그 등록
+POST {{host}}/products
+Content-Type: application/json
+ngrok-skip-browser-warning: 1
+
+{
+  "product_name": "",
+  "price": 1700,
+  "category": "생필품",
+  "tags": [666]
+}
+
+### 5) ✅ 기존 상품에 태그 1개 추가
+POST {{host}}/products/2/tags
+Content-Type: application/json
+ngrok-skip-browser-warning: 1
+
+{
+  "tag_id": "test1"
+}
+
+### 6) (참고) 스캔
+POST {{host}}/scan
+Content-Type: application/json
+ngrok-skip-browser-warning: 1
+
+{ "rfid": "1" }
+
+### 7) (참고) 구매 처리
+POST {{host}}/purchase/test1
+ngrok-skip-browser-warning: 1
+
+### 8) (참고) 재입고(복원)
+PUT {{host}}/restock/TAG_NEW_123
+ngrok-skip-browser-warning: 1
+
+### 서버 상태 확인
+GET {{host}}/health
+ngrok-skip-browser-warning: 1
+
+### 최근 구매 영수증 확인
+GET {{host}}/purchase-history
+ngrok-skip-browser-warning: 1
+
+### 재고 확인
+GET {{host}}/products-with-qty
+ngrok-skip-browser-warning: 1

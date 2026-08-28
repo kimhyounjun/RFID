@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Luminescent Concierge - Completion</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#2d3133",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8eb",
+                        "on-surface": "#191c1e",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#301400",
+                        "primary-container": "#2574d2",
+                        "on-tertiary-container": "#fffbff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d8dadd",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "tertiary-fixed-dim": "#ffb782",
+                        "inverse-primary": "#a8c8ff",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdcc5",
+                        "tertiary": "#904900",
+                        "primary-fixed": "#d6e3ff",
+                        "on-secondary-container": "#445a7f",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "on-primary-fixed": "#001b3c",
+                        "inverse-on-surface": "#eff1f4",
+                        "surface-tint": "#005eb4",
+                        "surface-container": "#eceef1",
+                        "on-primary-fixed-variant": "#00468a",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f7f9fc",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1e",
+                        "tertiary-container": "#b55d00",
+                        "on-secondary-fixed": "#001b3c",
+                        "outline": "#727784",
+                        "secondary-fixed": "#d6e3ff",
+                        "surface-variant": "#e0e3e6",
+                        "surface": "#f7f9fc",
+                        "primary": "#005bb0",
+                        "on-surface-variant": "#414752",
+                        "on-primary-container": "#fefcff",
+                        "background": "#f7f9fc",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#bcd2fd",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-secondary-fixed-variant": "#31476b",
+                        "secondary-fixed-dim": "#b1c7f2",
+                        "outline-variant": "#c1c6d4",
+                        "surface-container-low": "#f2f4f7",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#495f84"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-abstract {
+            background-color: #f7f9fc;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 91, 176, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(37, 116, 210, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(168, 200, 255, 0.03) 0%, transparent 60%);
+        }
+
+        .blurred-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body class="bg-abstract font-body text-on-surface min-h-screen flex flex-col relative overflow-hidden">
+    <div class="blurred-circle bg-primary-fixed-dim w-[500px] h-[500px] -top-40 -left-20 opacity-30"></div>
+    <div class="blurred-circle bg-secondary-container w-[400px] h-[400px] bottom-10 right-0 opacity-20"></div>
+
+    <div class="absolute bottom-20 left-10 opacity-20 rotate-12 scale-75 hidden md:block">
+        <div class="w-40 h-56 bg-surface-container rounded-xl shadow-lg border border-white/20"></div>
+    </div>
+    <div class="absolute top-40 right-10 opacity-20 -rotate-6 scale-90 hidden md:block">
+        <div class="w-32 h-32 bg-secondary-container rounded-full shadow-lg border border-white/20"></div>
+    </div>
+
+    <main class="flex-grow flex items-center justify-center p-6 relative z-10">
+        <div class="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] p-16 flex flex-col items-center justify-center w-full max-w-2xl shadow-[0px_24px_48px_-12px_rgba(25,28,30,0.08)] border border-white/50">
+            <div class="w-32 h-32 rounded-full bg-blue-50 flex items-center justify-center mb-10">
+                <span class="material-symbols-outlined text-blue-600 text-7xl" style="font-variation-settings: 'FILL' 1;">
+                    check_circle
+                </span>
+            </div>
+
+            <div class="text-center space-y-4">
+                <h1 class="font-headline font-bold text-4xl tracking-tight text-on-surface">
+                    이용해주셔서 감사합니다
+                </h1>
+                <p class="font-body text-xl text-on-surface-variant font-medium">
+                    Thank you for using our service
+                </p>
+            </div>
+
+            <div class="mt-16 w-full h-px bg-surface-container-highest opacity-50"></div>
+
+            <div class="mt-8 flex items-center gap-3 text-on-surface-variant/60">
+                <span class="material-symbols-outlined text-lg">schedule</span>
+                <span class="font-label text-sm tracking-wide font-bold" id="countdown-timer">
+                    SESSION CLOSING IN 5 SECONDS
+                </span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 px-8 py-3 bg-white/40 backdrop-blur-md rounded-full border border-white/20 shadow-sm z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">System Ready</span>
+        </div>
+        <div class="w-px h-3 bg-outline-variant"></div>
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-on-surface-variant">weight</span>
+            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Scale Active</span>
+        </div>
+    </footer>
+
+    <script>
+        let timeLeft = 5;
+        const countdownElement = document.getElementById('countdown-timer');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                countdownElement.textContent = 'SESSION CLOSING IN 0 SECONDS';
+                // 5초 후 first.html로 이동
+                window.location.href = 'first.html';
+            } else {
+                countdownElement.textContent = `SESSION CLOSING IN ${timeLeft} SECONDS`;
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>

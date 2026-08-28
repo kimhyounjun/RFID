@@ -1,0 +1,18 @@
+# Environment Variables
+.env
+
+# Python Virtual Environment
+venv/
+env/
+ENV/
+
+# Byte-compiled / Optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# macOS
+.DS_Store
+
+# Saved Chats (Optional, if we want to ignore local chat logs)
+saved_chats/

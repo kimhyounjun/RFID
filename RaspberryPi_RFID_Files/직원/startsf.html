@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <script>
+      const API_BASE_URL = "https:192.168.219.119:5000";
+    </script>
+
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>KONBINI - Your Everyday Stop</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#007BFF",
+              secondary: "#FFA500",
+              "background-light": "#f8f6f5",
+              "background-dark": "#221410",
+              "text-light": "#333333",
+              "text-dark": "#f8f6f5",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "0.75rem",
+              xl: "1rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+
+      .bg-abstract {
+        background-color: #f0f4f9;
+        background-image:
+          radial-gradient(at 100% 100%, #e2eaf4 0px, transparent 50%),
+          radial-gradient(at 0% 0%, #e8f0f8 0px, transparent 50%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .abstract-shape {
+        position: absolute;
+        background: rgba(180, 204, 232, 0.5);
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: -1;
+      }
+
+      .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
+      .shape-2 { width: 400px; height: 400px; bottom: -100px; right: -50px; }
+      .shape-3 { width: 300px; height: 300px; top: 15%; right: 15%; }
+      .shape-4 { width: 250px; height: 250px; bottom: 20%; left: 5%; }
+    </style>
+  </head>
+
+  <body class="bg-abstract dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
+    <div class="abstract-shape shape-3"></div>
+    <div class="abstract-shape shape-4"></div>
+
+    <div class="relative flex min-h-screen w-full flex-col">
+
+      <main class="flex-grow">
+        <section class="relative h-screen w-full">
+
+          <div class="relative z-10 flex h-full items-center justify-center p-4 md:p-12 lg:p-24">
+            <div class="flex max-w-md w-full flex-col items-center gap-10 rounded-xl bg-white/85 p-8 backdrop-blur-sm dark:bg-background-dark/85">
+
+              <h1 class="font-display text-5xl font-extrabold">
+                Staff
+              </h1>
+
+              <!-- 버튼 3개 -->
+              <div class="flex flex-col items-center gap-8">
+
+                <!-- 상품 확인 -->
+                <div class="flex flex-col items-center gap-2">
+                  <a href="check.html"
+                    class="w-20 h-20 flex items-center justify-center rounded-full bg-primary text-white text-3xl shadow-lg hover:scale-110 transition"
+                  >
+                    <span class="material-symbols-outlined text-4xl">search</span>
+                  </a>
+                  <span class="font-bold">재고 확인</span>
+                </div>
+
+                <!-- 재고 추가 -->
+                <div class="flex flex-col items-center gap-2">
+                  <a href="add.html"
+                    class="w-20 h-20 flex items-center justify-center rounded-full bg-primary text-white text-3xl shadow-lg hover:scale-110 transition"
+                  >
+                    <span class="material-symbols-outlined text-4xl">add</span>
+                  </a>
+                  <span class="font-bold">재고 추가</span>
+                </div>
+
+                <!-- 상품 삭제 -->
+                <div class="flex flex-col items-center gap-2">
+                  <a href="del.html"
+                    class="w-20 h-20 flex items-center justify-center rounded-full bg-primary text-white text-3xl shadow-lg hover:scale-110 transition"
+                  >
+                    <span class="material-symbols-outlined text-4xl">delete</span>
+                  </a>
+                  <span class="font-bold">재고 삭제</span>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

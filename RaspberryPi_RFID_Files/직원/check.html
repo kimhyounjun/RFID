@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <script>
+      const API_BASE_URL = "https://walton-wharfless-lanie.ngrok-free.dev";
+    </script>
+
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>재고 확인 - Convenience Store</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#f2460d",
+              "background-light": "#f8f6f5",
+              "background-dark": "#221410",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+      .modal.hidden {
+        display: none;
+      }
+
+      .bg-abstract {
+        background-color: #f0f4f9;
+        background-image:
+          radial-gradient(at 100% 100%, #e2eaf4 0px, transparent 50%),
+          radial-gradient(at 0% 0%, #e8f0f8 0px, transparent 50%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .abstract-shape {
+        position: absolute;
+        background: rgba(180, 204, 232, 0.5);
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: -1;
+      }
+
+      .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
+      .shape-2 { width: 400px; height: 400px; bottom: -100px; right: -50px; }
+      .shape-3 { width: 300px; height: 300px; top: 15%; right: 15%; }
+      .shape-4 { width: 250px; height: 250px; bottom: 20%; left: 5%; }
+    </style>
+  </head>
+
+  <body class="bg-abstract font-display">
+
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
+    <div class="abstract-shape shape-3"></div>
+    <div class="abstract-shape shape-4"></div>
+
+    <div
+      class="relative flex h-auto min-h-screen w-full flex-col dark:bg-background-dark group/design-root overflow-x-hidden"
+    >
+
+      <!-- 메인 컨텐츠 -->
+      <div class="relative layout-container flex h-full grow flex-col justify-center">
+        <div class="flex flex-1 items-center justify-center p-4 sm:p-6 md:p-8">
+          <div
+            class="layout-content-container flex w-full max-w-2xl flex-col items-center justify-center rounded-xl bg-background-light/80 dark:bg-background-dark/80 p-6 shadow-2xl backdrop-blur-lg sm:p-8 md:p-10"
+          >
+            <h1
+              class="text-gray-900 dark:text-white tracking-light text-[32px] font-bold leading-tight text-center pb-6"
+            >
+              재고 확인
+            </h1>
+
+            <!-- 검색 입력 -->
+            <div class="w-full max-w-md px-4 py-3">
+              <label class="flex flex-col min-w-40 h-12 w-full">
+                <div class="flex w-full flex-1 items-stretch rounded-lg h-full shadow-sm">
+                  <div
+                    class="text-gray-500 dark:text-gray-400 flex border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0"
+                  >
+                    <span class="material-symbols-outlined">search</span>
+                  </div>
+                  <input
+                    id="search-input"
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-full placeholder:text-gray-500 dark:placeholder:text-gray-400 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                    placeholder="상품명을 입력하세요"
+                  />
+                </div>
+              </label>
+            </div>
+
+            <!-- 검색 버튼 -->
+            <div class="flex w-full max-w-md px-4 py-3">
+              <button
+                id="btn-search"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-blue-500 text-white text-base font-bold leading-normal tracking-[0.015em] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-blue-600"
+              >
+                <span class="truncate">검색</span>
+              </button>
+            </div>
+
+            <!-- 재고 테이블 -->
+            <div class="mt-6 w-full overflow-x-auto">
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700">
+                  <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                    <thead class="bg-gray-100/50 dark:bg-gray-800/50">
+                      <tr>
+                        <th
+                          class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
+                        >
+                          상품명
+                        </th>
+                        <th
+                          class="px-4 py-3.5 text-center text-sm font-semibold text-gray-900 dark:text-white"
+                        >
+                          상품 개수
+                        </th>
+                        <th
+                          class="px-4 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-white"
+                        >
+                          상품 가격
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody
+                      id="inventory-table-body"
+                      class="divide-y divide-gray-200 dark:divide-gray-700 bg-white/70 dark:bg-gray-900/70"
+                    >
+                      <tr>
+                        <td
+                          colspan="3"
+                          class="px-4 py-4 text-center text-sm text-gray-700 dark:text-gray-200"
+                        >
+                          데이터베이스 로딩 중...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- 🔵 구매 영수증 / 매출표 버튼 -->
+            <div
+              class="text-center mt-8 flex flex-col md:flex-row gap-12 justify-center"
+            >
+              <!-- 구매 영수증 보기 -->
+              <a
+                href="receipt.html"
+                class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-600 shadow-md transition-transform duration-200 hover:scale-105"
+              >
+                구매 영수증 보기
+              </a>
+
+              <!-- 매출표 보기 -->
+              <a
+                href="sales.html"
+                class="inline-block bg-gray-800 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-700 shadow-md transition-transform duration-200 hover:scale-105"
+              >
+                매출표 보기
+              </a>
+            </div>
+
+            <!-- 되돌아가기 -->
+            <a
+              class="text-gray-700 dark:text-gray-300 text-sm font-normal leading-normal pb-3 pt-6 px-4 text-center underline hover:text-primary dark:hover:text-primary/80"
+              href="startsf.html"
+            >
+              기본화면으로 돌아가기
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 검색 결과 모달 -->
+    <div
+      id="search-modal"
+      class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <div id="modal-backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+      <div class="relative w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6 shadow-xl">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">검색 결과</h2>
+
+        <div id="modal-content">
+          <div id="modal-result-found" class="hidden">
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-600 dark:text-gray-300">상품명:</span>
+                <span id="modal-product-name" class="font-bold text-gray-900 dark:text-white"></span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="text-gray-600 dark:text-gray-300">남은 수량:</span>
+                <span id="modal-product-quantity" class="font-bold text-gray-900 dark:text-white"></span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="text-gray-600 dark:text-gray-300">가격:</span>
+                <span id="modal-product-price" class="font-bold text-gray-900 dark:text-white"></span>
+              </div>
+            </div>
+          </div>
+
+          <div id="modal-result-not-found" class="hidden">
+            <p class="text-center text-gray-700 dark:text-gray-200">
+              <span class="material-symbols-outlined text-3xl text-primary">error</span><br />
+              상품을 찾을 수 없습니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 text-right">
+          <button
+            id="btn-close-modal"
+            class="rounded-lg bg-primary px-5 py-2 text-base font-bold text-white hover:bg-primary/90"
+          >
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.getElementById("inventory-table-body");
+        const searchInput = document.getElementById("search-input");
+        const searchButton = document.getElementById("btn-search");
+
+        const modal = document.getElementById("search-modal");
+        const modalBackdrop = document.getElementById("modal-backdrop");
+        const closeModalButton = document.getElementById("btn-close-modal");
+
+        const modalResultFound = document.getElementById("modal-result-found");
+        const modalResultNotFound = document.getElementById("modal-result-not-found");
+        const modalProductName = document.getElementById("modal-product-name");
+        const modalProductQuantity = document.getElementById("modal-product-quantity");
+        const modalProductPrice = document.getElementById("modal-product-price");
+
+        let products = [];
+
+        async function loadAllItems() {
+          try {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="3" class="px-4 py-4 text-center text-sm text-gray-700 dark:text-gray-200">
+                  데이터베이스에서 불러오는 중...
+                </td>
+              </tr>
+            `;
+
+            const resp = await fetch(API_BASE_URL + "/products-with-qty", {
+              headers: {
+                Accept: "application/json",
+                "ngrok-skip-browser-warning": "1",
+              },
+            });
+
+            const contentType = resp.headers.get("content-type") || "";
+
+            if (!resp.ok) {
+              const text = await resp.text();
+              console.error("[products-with-qty] error:", resp.status, text);
+              throw new Error("API 오류 발생");
+            }
+
+            if (!contentType.includes("application/json")) {
+              const text = await resp.text();
+              console.error("[products-with-qty] JSON 아님: ", text.slice(0, 500));
+              throw new Error("JSON이 아닌 응답");
+            }
+
+            const data = await resp.json();
+            const items = Array.isArray(data) ? data : data.items || [];
+            products = items;
+            renderTable(items);
+          } catch (error) {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="3" class="px-4 py-4 text-center text-sm text-red-500">
+                  데이터를 불러오는 중 오류가 발생했습니다.
+                </td>
+              </tr>
+            `;
+          }
+        }
+
+        function renderTable(items) {
+          tableBody.innerHTML = "";
+          if (!items.length) {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="3" class="px-4 py-4 text-center text-sm text-gray-500">
+                  재고 데이터가 없습니다.
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          items.forEach((item) => {
+            const name = item.product_name || item.name || "상품";
+            const quantity = item.qty ?? item.quantity ?? item.stock ?? 0;
+            const price = Number(item.price ?? 0);
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">${name}</td>
+              <td class="px-4 py-4 text-center text-sm text-gray-600 dark:text-gray-300">${quantity}</td>
+              <td class="px-4 py-4 text-right text-sm text-gray-600 dark:text-gray-300">₩${price.toLocaleString()}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        }
+
+        async function handleSearch() {
+          const searchTerm = searchInput.value.trim();
+          if (!searchTerm) {
+            alert("검색할 상품명을 입력하세요.");
+            return;
+          }
+
+          if (!products.length) {
+            await loadAllItems();
+          }
+
+          const lower = searchTerm.toLowerCase();
+          const found = products.find((item) =>
+            (item.product_name || item.name || "").toLowerCase().includes(lower),
+          );
+
+          if (found) {
+            modalProductName.textContent = found.product_name || found.name;
+            modalProductQuantity.textContent = `${found.qty ?? found.quantity ?? 0}개`;
+            modalProductPrice.textContent = `₩${(found.price ?? 0).toLocaleString()}`;
+
+            modalResultNotFound.classList.add("hidden");
+            modalResultFound.classList.remove("hidden");
+          } else {
+            modalResultFound.classList.add("hidden");
+            modalResultNotFound.classList.remove("hidden");
+          }
+
+          modal.classList.remove("hidden");
+        }
+
+        searchButton.addEventListener("click", handleSearch);
+        searchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") handleSearch();
+        });
+
+        closeModalButton.addEventListener("click", () => modal.classList.add("hidden"));
+        modalBackdrop.addEventListener("click", () => modal.classList.add("hidden"));
+
+        loadAllItems();
+      });
+    </script>
+  </body>
+</html>

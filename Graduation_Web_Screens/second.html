@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed-dim": "#ffb782",
+                        "tertiary-container": "#b55d00",
+                        "surface-bright": "#f7f9fc",
+                        "on-primary-fixed": "#001b3c",
+                        "inverse-surface": "#2d3133",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d6e3ff",
+                        "surface-variant": "#e0e3e6",
+                        "surface-container-low": "#f2f4f7",
+                        "on-tertiary-container": "#fffbff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#ffdcc5",
+                        "on-tertiary-fixed": "#301400",
+                        "on-secondary-container": "#445a7f",
+                        "secondary": "#495f84",
+                        "surface-tint": "#005eb4",
+                        "surface-dim": "#d8dadd",
+                        "on-secondary-fixed": "#001b3c",
+                        "outline-variant": "#c1c6d4",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "primary-container": "#2574d2",
+                        "inverse-primary": "#a8c8ff",
+                        "primary-fixed": "#d6e3ff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#414752",
+                        "on-background": "#191c1e",
+                        "surface-container-high": "#e6e8eb",
+                        "on-secondary-fixed-variant": "#31476b",
+                        "secondary-container": "#bcd2fd",
+                        "inverse-on-surface": "#eff1f4",
+                        "outline": "#727784",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "on-primary-container": "#fefcff",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "surface": "#f7f9fc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eceef1",
+                        "on-primary-fixed-variant": "#00468a",
+                        "secondary-fixed-dim": "#b1c7f2",
+                        "primary": "#005bb0",
+                        "tertiary": "#904900",
+                        "surface-container-highest": "#e0e3e6",
+                        "background": "#f7f9fc"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    keyframes: {
+                        wave: {
+                            '0%, 100%': { transform: 'translateY(0)', opacity: '0.3' },
+                            '50%': { transform: 'translateY(-4px)', opacity: '1' },
+                        },
+                        dotPulse: {
+                            '0%, 100%': { opacity: '0.2', transform: 'scale(0.8)' },
+                            '50%': { opacity: '1', transform: 'scale(1.2)' },
+                        }
+                    },
+                    animation: {
+                        wave: 'wave 1.2s ease-in-out infinite',
+                        'dot-pulse': 'dotPulse 1.5s ease-in-out infinite',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 40;
+        }
+
+        .bg-abstract {
+            background-color: #f7f9fc;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 91, 176, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(37, 116, 210, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(168, 200, 255, 0.03) 0%, transparent 60%);
+        }
+
+        .blurred-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+    </style>
+</head>
+
+<body class="bg-abstract font-body text-on-surface min-h-screen flex flex-col overflow-hidden select-none cursor-pointer" onclick="window.location.href='third.html'">
+
+    <div class="blurred-circle bg-primary-fixed-dim w-[500px] h-[500px] -top-40 -left-20 opacity-30"></div>
+    <div class="blurred-circle bg-secondary-container w-[400px] h-[400px] bottom-10 right-0 opacity-20"></div>
+
+    <header class="fixed top-0 w-full z-50 bg-transparent flex justify-between items-center px-12 py-8">
+        <div></div>
+        <div></div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center px-6 relative">
+        <div class="w-full max-w-2xl bg-white/80 backdrop-blur-2xl rounded-[2.5rem] p-16 flex flex-col items-center justify-center text-center shadow-[0px_24px_48px_-12px_rgba(25,28,30,0.08)]">
+            <div class="mb-12">
+                <h1 class="font-headline text-5xl font-extrabold text-on-surface tracking-tight mb-4 leading-tight">
+                    장바구니를 올려주세요
+                </h1>
+                <p class="text-on-surface-variant text-xl font-medium tracking-wide">
+                    Please place your shopping basket
+                </p>
+            </div>
+
+            <div class="relative group mb-12">
+                <div class="absolute inset-0 bg-primary-container/10 rounded-full scale-150 blur-xl"></div>
+                <div class="relative w-48 h-48 bg-surface-container-low rounded-full flex items-center justify-center border border-white/50">
+                    <span class="material-symbols-outlined text-[80px] text-primary" style="font-variation-settings: 'wght' 200;">
+                        shopping_cart
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-3 h-3 rounded-full bg-primary animate-dot-pulse"></div>
+                <div class="w-3 h-3 rounded-full bg-primary animate-dot-pulse animation-delay-200"></div>
+                <div class="w-3 h-3 rounded-full bg-primary animate-dot-pulse animation-delay-400"></div>
+            </div>
+
+            <div class="mt-4 flex flex-col items-center gap-4">
+                <div class="flex items-center gap-3 text-primary font-semibold py-4 px-8 bg-primary/5 rounded-full border border-primary/10">
+                    <span class="material-symbols-outlined">sensors</span>
+                    <span class="font-label text-sm uppercase tracking-widest">Awaiting Detection</span>
+                </div>
+                <p class="text-outline text-sm mt-4">
+                    Tap anywhere or place basket to continue
+                </p>
+            </div>
+        </div>
+
+        <div class="absolute bottom-20 left-10 opacity-20 rotate-12 scale-75 hidden md:block">
+            <div class="w-40 h-56 bg-surface-container rounded-xl shadow-lg border border-white/20"></div>
+        </div>
+        <div class="absolute top-40 right-10 opacity-20 -rotate-6 scale-90 hidden md:block">
+            <div class="w-32 h-32 bg-secondary-container rounded-full shadow-lg border border-white/20"></div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 px-8 py-3 bg-white/40 backdrop-blur-md rounded-full border border-white/20 shadow-sm z-10">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">System Ready</span>
+        </div>
+        <div class="w-px h-3 bg-outline-variant"></div>
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-on-surface-variant">weight</span>
+            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Scale Active</span>
+        </div>
+    </footer>
+
+    <button aria-label="Back" class="fixed bottom-8 left-8 w-16 h-16 flex items-center justify-center bg-white shadow-lg hover:bg-surface-container transition-all active:scale-90 group z-50 rounded-2xl border border-primary/10" onclick="event.stopPropagation(); window.location.href='first.html'">
+        <span class="material-symbols-outlined text-primary text-4xl">
+            arrow_back
+        </span>
+    </button>
+
+    <button aria-label="Home" class="fixed bottom-8 right-8 w-16 h-16 flex items-center justify-center bg-white shadow-lg hover:bg-surface-container transition-all active:scale-90 group z-50 rounded-2xl border border-primary/10" onclick="event.stopPropagation(); window.location.href='first.html'">
+        <span class="material-symbols-outlined text-primary text-4xl">
+            home
+        </span>
+    </button>
+
+</body>
+
+</html>

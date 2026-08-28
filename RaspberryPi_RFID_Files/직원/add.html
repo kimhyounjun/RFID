@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <script>
+      // FastAPI 백엔드 주소
+      const API_BASE_URL = "https://walton-wharfless-lanie.ngrok-free.dev";
+      // 라즈베리에서 돌고 있는 start2.py(Flask) 주소
+      const LOCAL_API_URL = "http://192.168.47.80:5000";
+    </script>
+
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>태그 등록하기 - Convenience Store</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#f2460d",
+              "background-light": "#f8f6f5",
+              "background-dark": "#221410",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", "Noto Sans KR", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+      #toast-popup {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .bg-abstract {
+        background-color: #f0f4f9;
+        background-image:
+          radial-gradient(at 100% 100%, #e2eaf4 0px, transparent 50%),
+          radial-gradient(at 0% 0%, #e8f0f8 0px, transparent 50%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .abstract-shape {
+        position: absolute;
+        background: rgba(180, 204, 232, 0.5);
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: -1;
+      }
+
+      .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
+      .shape-2 { width: 400px; height: 400px; bottom: -100px; right: -50px; }
+      .shape-3 { width: 300px; height: 300px; top: 15%; right: 15%; }
+      .shape-4 { width: 250px; height: 250px; bottom: 20%; left: 5%; }
+    </style>
+  </head>
+
+  <body class="bg-abstract font-display">
+
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
+    <div class="abstract-shape shape-3"></div>
+    <div class="abstract-shape shape-4"></div>
+
+    <!-- ✅ 토스트 -->
+    <div
+      id="toast-popup"
+      class="fixed top-20 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-green-600 px-6 py-4 text-white font-bold shadow-lg opacity-0 -translate-y-10"
+    >
+      <span class="material-symbols-outlined align-middle mr-2">
+        check_circle
+      </span>
+      <span id="toast-message-text">등록이 완료되었습니다</span>
+    </div>
+
+    <div
+      class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden"
+    >
+
+      <div class="relative flex flex-1 items-center justify-center p-6">
+        <div
+          class="w-full max-w-md bg-background-light/90 dark:bg-background-dark/90 rounded-2xl p-8 shadow-2xl backdrop-blur-lg"
+        >
+          <h1
+            class="text-gray-900 dark:text-white text-center text-[28px] font-bold pb-6"
+          >
+            재고 등록
+          </h1>
+
+          <div class="space-y-6">
+            <!-- 태그 ID -->
+            <div>
+              <input
+                id="tag-id"
+                type="text"
+                placeholder="태그 ID (스캔 또는 직접 입력)"
+                class="w-full rounded-md border-gray-300 bg-white/90 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-center text-lg shadow-sm focus:border-primary focus:ring-primary"
+              />
+            </div>
+
+            <!-- 상품명 -->
+            <div>
+              <input
+                id="product-name"
+                type="text"
+                placeholder="상품명을 입력하세요"
+                class="w-full rounded-md border-gray-300 bg-white/90 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-center text-lg shadow-sm focus:border-primary focus:ring-primary"
+              />
+            </div>
+
+            <!-- 가격 (새 상품일 때만 표시) -->
+            <div>
+              <input
+                id="product-price"
+                type="number"
+                min="0"
+                placeholder="가격을 입력하세요 (원) - 새 상품일 때만 필수"
+                class="w-full rounded-md border-gray-300 bg-white/90 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-center text-lg shadow-sm focus:border-primary focus:ring-primary"
+              />
+            </div>
+
+            <div class="pt-2">
+              <button
+                id="btn-submit"
+                class="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg shadow-md hover:scale-[1.02] active:scale-[0.98] transition-transform"
+              >
+                등록하기
+              </button>
+            </div>
+          </div>
+
+          <a
+            id="back-link"
+            href="startsf.html"
+            class="text-black dark:text-gray-200 text-sm text-center block mt-8 underline hover:text-white"
+          >
+            기본화면으로 돌아가기
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const tagIdInput = document.getElementById("tag-id");
+      const productNameInput = document.getElementById("product-name");
+      const productPriceInput = document.getElementById("product-price");
+      const submitButton = document.getElementById("btn-submit");
+      const backLink = document.getElementById("back-link");
+
+      const toastPopup = document.getElementById("toast-popup");
+      const toastMessageText =
+        document.getElementById("toast-message-text");
+
+      let toastTimer = null;
+
+      // 🧠 한 페이지(세션)에서만 사용하는 상태
+      let lastProcessedTagId = null; // 화면에 마지막으로 찍은 태그
+      let tagLocked = false; // 한 번 태그가 들어오면 잠금
+      let isManualEditing = false;
+      let manualEditTimer = null;
+
+      let ignoreTagId = null; // 바로 전에 등록 완료된 태그 → 다시 자동입력 안 함
+      let nextScanAllowedAt = 0; // 등록 후 2초 동안은 새 태그 입력 안 받기
+
+      // ✅ DB에 이미 존재하는 상품명 목록
+      let existingProductNames = new Set();
+
+      // ✅ 가격 row 엘리먼트 (보였다/숨겼다 할 대상)
+      let priceRowEl = null;
+
+      async function loadExistingProducts() {
+        try {
+          const resp = await fetch(API_BASE_URL + "/products-with-qty", {
+            cache: "no-store",
+            headers: {
+              Accept: "application/json",
+              "ngrok-skip-browser-warning": "any",
+            },
+          });
+
+          if (!resp.ok) {
+            console.error("products-with-qty 오류:", resp.status);
+            return;
+          }
+
+          const contentType = resp.headers.get("content-type") || "";
+          if (!contentType.includes("application/json")) {
+            console.error("products-with-qty JSON 아님!");
+            return;
+          }
+
+          const data = await resp.json();
+          const items = Array.isArray(data) ? data : data.items || [];
+
+          items.forEach((item) => {
+            const name = (item.name || item.product_name || "")
+              .trim()
+              .toLowerCase();
+            if (name) existingProductNames.add(name);
+          });
+
+          console.log("기존 상품명 목록:", existingProductNames);
+        } catch (e) {
+          console.error("기존 상품 목록 로딩 실패:", e);
+        }
+      }
+
+      // --- 스캔 ON/OFF ---
+      async function scanStart() {
+        try {
+          const resp = await fetch(LOCAL_API_URL + "/scan/start", {
+            method: "POST",
+          });
+          console.log("add → scan/start:", resp.status);
+        } catch (e) {
+          console.error("scan/start 호출 실패:", e);
+        }
+      }
+
+      async function scanStop() {
+        try {
+          const resp = await fetch(LOCAL_API_URL + "/scan/stop", {
+            method: "POST",
+          });
+          console.log("add → scan/stop:", resp.status);
+        } catch (e) {
+          console.error("scan/stop 호출 실패:", e);
+        }
+      }
+
+      function scanStopBeacon() {
+        try {
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(LOCAL_API_URL + "/scan/stop");
+          } else {
+            fetch(LOCAL_API_URL + "/scan/stop", {
+              method: "POST",
+              keepalive: true,
+            }).catch(() => {});
+          }
+          console.log("add → scan/stop(beacon) 시도");
+        } catch (e) {
+          console.error("scan/stop(beacon) 실패:", e);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // ✅ 가격 입력칸 div 캐시 + 기본은 숨김
+        priceRowEl = productPriceInput.closest("div");
+        if (priceRowEl) {
+          priceRowEl.style.display = "none";
+        }
+
+        // ✅ 기존 상품 목록 로딩
+        loadExistingProducts();
+
+        // ✅ 페이지 들어올 때 스캔 시작
+        scanStart();
+
+        // ✅ 페이지 나갈 때 스캔 정지
+        window.addEventListener("beforeunload", scanStopBeacon);
+        window.addEventListener("pagehide", scanStopBeacon);
+
+        // ✅ "언어 선택으로 돌아가기" 클릭 시 확실히 stop 후 이동
+        if (backLink) {
+          backLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            const href = backLink.href;
+         
+            scanStopBeacon();
+            window.location.href = href;
+          });
+        }
+
+        // 사용자가 태그 ID를 직접 수정하는 경우
+        tagIdInput.addEventListener("input", () => {
+          isManualEditing = true;
+
+          // 입력창이 비워지면 다시 새 태그 받기 가능
+          if (tagIdInput.value.trim() === "") {
+            tagLocked = false;
+            lastProcessedTagId = null;
+          }
+
+          if (manualEditTimer) clearTimeout(manualEditTimer);
+          manualEditTimer = setTimeout(() => {
+            isManualEditing = false;
+          }, 1500);
+        });
+
+        // --- 로컬 서버에서 태그 ID 주기적으로 가져오기 ---
+        function checkTagUpdate() {
+          fetch(LOCAL_API_URL + "/latest-tag")
+            .then((resp) => {
+              if (!resp.ok)
+                throw new Error(
+                  "Local Server Status=" + resp.status
+                );
+              return resp.json();
+            })
+            .then((data) => {
+              const latestTagId = data.tag_id;
+              const now = Date.now();
+
+              if (!latestTagId) return;
+
+              // ⏱ 등록 직후 2초 동안은 새 태그 자동 입력 안 함
+              if (now < nextScanAllowedAt) return;
+
+              // 직전에 등록 완료된 태그는 무시
+              if (ignoreTagId && latestTagId === ignoreTagId) return;
+
+              // 이미 한 번 채워졌으면(잠금 상태) 무시
+              if (tagLocked) return;
+
+              // 사람이 직접 입력 중이면 무시
+              if (isManualEditing) return;
+
+              // 새 태그면 입력창에 넣고 잠금
+              if (latestTagId !== lastProcessedTagId) {
+                tagIdInput.value = latestTagId;
+                lastProcessedTagId = latestTagId;
+                tagLocked = true; // 🔒 이 태그로 고정
+                console.log("✅ 태그 ID 자동 입력됨:", latestTagId);
+                productNameInput.focus();
+              }
+            })
+            .catch((err) => {
+              // console.error("로컬 태그 서버 오류:", err);
+            });
+        }
+
+        // ⏱ 인식 주기 (300ms마다 확인 = 꽤 빠르게)
+        setInterval(checkTagUpdate, 300);
+
+        // --- 등록 버튼 ---
+        submitButton.addEventListener("click", () => {
+          const tagId = tagIdInput.value.trim();
+          const productName = productNameInput.value.trim();
+          const priceStr = productPriceInput.value.trim();
+
+          if (tagId === "") {
+            alert("태그 ID를 입력하거나 스캔해주세요.");
+            tagIdInput.focus();
+            return;
+          }
+          if (productName === "") {
+            alert("상품명을 입력해주세요.");
+            productNameInput.focus();
+            return;
+          }
+
+          const normalizedName = productName.toLowerCase();
+          const isExisting = existingProductNames.has(normalizedName);
+
+          // ✅ 1) 기존 상품: 가격칸 필요 없음 → 바로 등록 (가격은 안 보냄)
+          if (isExisting) {
+            if (priceRowEl) {
+              priceRowEl.style.display = "none";
+            }
+            sendToServer(tagId, productName, "");
+            return;
+          }
+
+          // ✅ 2) 새 상품
+          // 2-1) 아직 가격칸이 안 보이는 상태라면 → 가격칸 보여주고 등록 중단
+          if (priceRowEl && priceRowEl.style.display === "none") {
+            alert("새로운 상품입니다. 가격을 설정해주세요.");
+            priceRowEl.style.display = "block";
+            productPriceInput.focus();
+            return; // ⛔️ 아직 서버로 보내지 않음
+          }
+
+          // 2-2) 새 상품 + 가격칸 보이는 상태 → 가격이 비어 있으면 또 막기
+          if (priceStr === "") {
+            alert("가격을 입력해주세요.");
+            productPriceInput.focus();
+            return;
+          }
+
+          // 2-3) 새 상품 + 가격 입력됨 → 이제 진짜 등록
+          sendToServer(tagId, productName, priceStr);
+        });
+      });
+
+      function sendToServer(tagId, productName, priceStr) {
+        submitButton.disabled = true;
+
+        const payload = {
+          tag_id: tagId,
+          product_name: productName,
+        };
+
+        if (priceStr !== "") {
+          payload.price = Number(priceStr);
+        }
+
+        fetch(API_BASE_URL + "/inventory/register-tag", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "any",
+          },
+          body: JSON.stringify(payload),
+        })
+          .then(async (resp) => {
+            let data = null;
+            try {
+              data = await resp.json();
+            } catch (e) {}
+
+            if (
+              resp.status === 409 ||
+              (resp.status === 400 &&
+                data &&
+                data.error_code === "DUPLICATE_TAG")
+            ) {
+              throw new Error("DUPLICATE_TAG_CONFLICT");
+            }
+
+            if (!resp.ok) {
+              console.error(
+                "서버 응답 오류:",
+                resp.status,
+                data
+              );
+              throw new Error("Server Status=" + resp.status);
+            }
+
+            return data;
+          })
+          .then((result) => {
+            console.log("등록 결과:", result);
+
+            // ✅ 등록 성공:
+            //   - 방금 등록한 태그는 ignoreTagId로 기억
+            //   - 2초 동안은 새 태그 자동 입력 안 받기
+            ignoreTagId = tagId;
+            nextScanAllowedAt = Date.now() + 2000;
+
+            // 입력창 초기화 + 새 태그 받을 준비
+            tagIdInput.value = "";
+            productNameInput.value = "";
+            productPriceInput.value = "";
+            lastProcessedTagId = null;
+            tagLocked = false;
+
+            const message = result.product_name
+              ? `'${result.product_name}' 등록 완료`
+              : "등록 완료";
+            showToast(message);
+            submitButton.disabled = false;
+
+            // ✅ 방법 2 전용: 성공 후 다시 가격칸 숨기기
+            if (priceRowEl) {
+              priceRowEl.style.display = "none";
+            }
+          })
+          .catch((err) => {
+            submitButton.disabled = false;
+            console.error(err);
+
+            if (
+              err.message.includes("DUPLICATE_TAG_CONFLICT")
+            ) {
+              alert(
+                "❌ 이미 등록된 태그입니다. 태그 ID를 확인해주세요."
+              );
+            } else {
+              alert("❌ 등록 실패. 콘솔 로그를 확인해주세요.");
+            }
+          });
+      }
+
+      function showToast(message) {
+        if (toastTimer) clearTimeout(toastTimer);
+
+        toastMessageText.textContent = message;
+
+        toastPopup.classList.remove(
+          "opacity-0",
+          "-translate-y-10"
+        );
+        toastTimer = setTimeout(() => {
+          toastPopup.classList.add(
+            "opacity-0",
+            "-translate-y-10"
+          );
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>

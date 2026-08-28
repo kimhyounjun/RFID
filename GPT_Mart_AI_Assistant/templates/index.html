@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자율무인 스마트 마트</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+        }
+
+        header {
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        main {
+            flex: 1;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--accent-glow);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Decorative Category Tag */
+        .category-tag {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .product-image-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2));
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.1);
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-image-placeholder {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .product-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .product-price::after {
+            content: '원';
+            font-size: 1rem;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        .product-meta {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .quantity {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .quantity.low {
+            color: var(--danger);
+        }
+
+        .quantity.in-stock {
+            color: var(--success);
+        }
+
+        .staff-badge {
+            font-size: 0.75rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: #fcd34d;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 0;
+            color: #64748b;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #94a3b8;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #475569;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card {
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .product-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .product-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .product-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .product-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .product-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .product-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        /* Chat Widget Styles */
+        #chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        #chat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        #chat-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 450px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #chat-window.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #chat-header {
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chat-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        #close-chat {
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .chat-msg {
+            max-width: 80%;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .chat-msg.bot {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .cart-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            background: #fff;
+        }
+
+        #chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: var(--text-color);
+            outline: none;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        #chat-input:focus {
+            border-color: var(--accent);
+        }
+
+        #chat-send {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        #chat-send:hover {
+            background: var(--text-color);
+        }
+
+        #chat-send:active {
+            transform: scale(0.95);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.3rem 0;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>자율무인 스마트 마트</h1>
+        <p>24시간 운영되는 인공지능 자율무인 마트입니다. 편안한 쇼핑 되세요!</p>
+    </header>
+
+    <main>
+        <div class="product-grid">
+            {% if products %}
+            {% for product in products %}
+            <div class="product-card">
+                <div class="category-tag">{{ product.category or 'General' }}</div>
+
+                <div class="product-image-placeholder">
+                    {% if product.category == 'Food' %}🍕
+                    {% elif product.category == 'Electronics' %}💻
+                    {% elif product.category == 'Clothing' %}👕
+                    {% elif product.category == 'Beverage' %}🥤
+                    {% else %}🛍️{% endif %}
+                </div>
+
+                <div class="product-info">
+                    <h2 class="product-name">{{ product.product_name }}</h2>
+                    <div class="product-price">{{ "{:,.0f}".format(product.price) }}</div>
+
+                    <div class="product-meta">
+                        <div class="quantity {% if product.quantity > 5 %}in-stock{% else %}low{% endif %}">
+                            <span
+                                style="display:inline-block; width:8px; height:8px; border-radius:50%; background:currentColor;"></span>
+                            {% if product.quantity > 0 %}
+                            재고: {{ product.quantity }}개
+                            {% else %}
+                            품절
+                            {% endif %}
+                        </div>
+
+                        {% if product.requires_staff %}
+                        <div class="staff-badge">무인 시스템 지원</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <h3>상품이 없습니다.</h3>
+                <p>데이터베이스의 products 테이블이 비어있거나, 연결 문제일 수 있습니다.</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 자율무인 스마트 마트. All rights reserved.
+    </footer>
+
+    <!-- Chat Widget -->
+    <div id="chat-widget">
+        <div id="chat-window">
+            <div id="chat-header">
+                <h3>무인 마트 AI 도우미 ✨</h3>
+                <span id="close-chat">✕</span>
+            </div>
+            <div id="chat-messages">
+                <div class="chat-msg bot">안녕하세요! 24시간 자율무인 마트 AI 어시스턴트입니다. 상품 위치나 결제 방법 등 무엇이든 물어보세요!</div>
+            </div>
+            <div id="chat-input-area">
+                <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off">
+                <button id="chat-send">➤</button>
+            </div>
+        </div>
+        <div id="chat-icon">💬</div>
+    </div>
+
+    <!-- Script for Chat -->
+    <script>
+        const chatIcon = document.getElementById('chat-icon');
+        const chatWindow = document.getElementById('chat-window');
+        const closeChat = document.getElementById('close-chat');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatMessages = document.getElementById('chat-messages');
+
+        // Toggle chat window
+        chatIcon.addEventListener('click', () => {
+            chatWindow.classList.toggle('active');
+            if (chatWindow.classList.contains('active')) {
+                chatInput.focus();
+            }
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatWindow.classList.remove('active');
+        });
+
+        // Add message to UI
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-msg ${sender}`;
+
+            if (sender === 'bot') {
+                // Convert newlines to <br> for proper HTML rendering
+                let htmlText = text.replace(/\n/g, '<br>');
+
+                // Convert '[장바구니 담기]' text to an actual button
+                htmlText = htmlText.replace(
+                    /\[장바구니 담기\]/g,
+                    '<button class="cart-btn" onclick="handleCartClick()">장바구니 담기</button>'
+                );
+
+                msgDiv.innerHTML = htmlText;
+            } else {
+                msgDiv.textContent = text;
+            }
+
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Handle Cart Button Click
+        window.handleCartClick = function () {
+            // Send a follow-up message as the user
+            chatInput.value = "이 상품 장바구니에 담아주세요.";
+            sendMessage();
+        };
+
+        function showTypingIndicator() {
+            const idc = document.createElement('div');
+            idc.className = 'chat-msg bot typing-container';
+            idc.id = 'typing-indicator';
+            idc.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            chatMessages.appendChild(idc);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const idc = document.getElementById('typing-indicator');
+            if (idc) idc.remove();
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Clear input and append User msg
+            chatInput.value = '';
+            appendMessage(text, 'user');
+
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                removeTypingIndicator();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    appendMessage(data.reply, 'bot');
+                } else {
+                    appendMessage('서버 오류가 발생했습니다. 나중에 다시 시도해주세요.', 'bot');
+                }
+            } catch (err) {
+                removeTypingIndicator();
+                appendMessage('네트워크 오류가 발생했습니다. 서버가 실행중인지 확인하세요.', 'bot');
+            }
+        }
+
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

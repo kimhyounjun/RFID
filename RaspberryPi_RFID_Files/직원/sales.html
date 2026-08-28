@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>매출표 - Convenience Store</title>
+
+    <script>
+      const API_BASE_URL = "https://walton-wharfless-lanie.ngrok-free.dev";
+    </script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#f2460d",
+              "background-light": "#f8f6f5",
+              "background-dark": "#221410",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+       .bg-abstract {
+        background-color: #f0f4f9;
+        background-image:
+          radial-gradient(at 100% 100%, #e2eaf4 0px, transparent 50%),
+          radial-gradient(at 0% 0%, #e8f0f8 0px, transparent 50%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .abstract-shape {
+        position: absolute;
+        background: rgba(180, 204, 232, 0.5);
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: -1;
+      }
+
+      .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
+      .shape-2 { width: 400px; height: 400px; bottom: -100px; right: -50px; }
+      .shape-3 { width: 300px; height: 300px; top: 15%; right: 15%; }
+      .shape-4 { width: 250px; height: 250px; bottom: 20%; left: 5%; }
+    </style>
+  </head>
+
+  <body class="bg-abstract font-display">
+
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
+    <div class="abstract-shape shape-3"></div>
+    <div class="abstract-shape shape-4"></div>
+
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+
+      <!-- 메인 컨텐츠 -->
+      <div class="relative flex flex-1 items-center justify-center p-4 md:p-8">
+        <div
+          class="w-full max-w-4xl rounded-xl bg-background-light/80 dark:bg-background-dark/80 p-6 md:p-10 shadow-2xl backdrop-blur-lg"
+        >
+          <!-- 헤더 -->
+          <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
+          >
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                매출표
+              </h1>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                최근 결제된 3달 기준으로 날짜별 매출을 보여줍니다.
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                id="btn-prev-month"
+                class="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                ◀ 이전 달
+              </button>
+              <div
+                id="current-month-label"
+                class="text-lg font-bold text-gray-900 dark:text-white min-w-[120px] text-center"
+              ></div>
+              <button
+                id="btn-next-month"
+                class="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                다음 달 ▶
+              </button>
+            </div>
+          </div>
+
+          <!-- 달력 -->
+          <div
+            class="bg-white/80 dark:bg-gray-900/80 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6"
+          >
+            <div
+              class="grid grid-cols-7 text-center text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
+            >
+              <div class="text-red-500">일</div>
+              <div>월</div>
+              <div>화</div>
+              <div>수</div>
+              <div>목</div>
+              <div>금</div>
+              <div class="text-blue-500">토</div>
+            </div>
+            <div
+              id="calendar-grid"
+              class="grid grid-cols-7 gap-2 text-xs md:text-sm"
+            >
+              <!-- JS에서 채움 -->
+            </div>
+          </div>
+
+          <!-- 하단 요약 -->
+          <div
+            class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+          >
+            <div class="text-sm text-gray-700 dark:text-gray-200">
+              <span
+                class="inline-block w-3 h-3 rounded-sm bg-primary/80 mr-1 align-middle"
+              ></span>
+              매출 발생한 날짜
+              <span
+                class="inline-block w-3 h-3 rounded-sm bg-gray-300 dark:bg-gray-700 ml-4 mr-1 align-middle"
+              ></span>
+              매출 없는 날짜
+            </div>
+            <div
+              id="month-summary"
+              class="text-sm font-semibold text-gray-900 dark:text-white"
+            >
+              이번 달 매출: 0원 (0건)
+            </div>
+          </div>
+
+          <!-- 뒤로가기 -->
+          <div class="mt-8 text-center">
+            <a
+              href="check.html"
+              class="text-white bg-blue-500 px-6 py-3 rounded-lg font-bold hover:bg-blue-600 shadow-md transition"
+            >
+              재고 확인으로 돌아가기
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 날짜별 상세 영수증 모달 -->
+    <div
+      id="detail-modal"
+      class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        id="detail-backdrop"
+        class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+      ></div>
+      <div
+        class="relative w-full max-w-lg rounded-xl bg-white dark:bg-gray-900 p-6 shadow-2xl max-h-[80vh] overflow-y-auto"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2
+            id="detail-date-title"
+            class="text-xl font-bold text-gray-900 dark:text-white"
+          >
+            날짜 매출 상세
+          </h2>
+          <button
+            id="btn-detail-close"
+            class="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div id="detail-content">
+          <!-- JS에서 채움 -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const calendarGrid = document.getElementById("calendar-grid");
+        const monthLabel = document.getElementById("current-month-label");
+        const monthSummary = document.getElementById("month-summary");
+
+        const btnPrev = document.getElementById("btn-prev-month");
+        const btnNext = document.getElementById("btn-next-month");
+
+        const detailModal = document.getElementById("detail-modal");
+        const detailBackdrop = document.getElementById("detail-backdrop");
+        const btnDetailClose = document.getElementById("btn-detail-close");
+        const detailDateTitle = document.getElementById("detail-date-title");
+        const detailContent = document.getElementById("detail-content");
+
+        // 현재 보고 있는 년/월
+        let currentYear, currentMonth; // month: 0~11
+        // purchase_history 원본
+        let historyRecords = [];
+        // 날짜별 집계: "YYYY-MM-DD" => { total, count, records: [.] }
+        let dailyMap = {};
+
+        function initCurrentMonth() {
+          const now = new Date();
+          currentYear = now.getFullYear();
+          currentMonth = now.getMonth();
+        }
+
+        function formatDateKey(d) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${y}-${m}-${day}`;
+        }
+
+        function formatDateLabel(year, month) {
+          return `${year}년 ${month + 1}월`;
+        }
+
+        function formatCurrency(n) {
+          return "₩" + Number(n || 0).toLocaleString();
+        }
+
+        async function loadHistory() {
+          try {
+            const resp = await fetch(API_BASE_URL + "/purchase-history", {
+              headers: {
+                Accept: "application/json",
+                "ngrok-skip-browser-warning": "1",
+              },
+            });
+
+            if (!resp.ok) {
+              console.error("purchase-history error:", resp.status);
+              return;
+            }
+
+            const data = await resp.json();
+            // 최대 20개 (백엔드에서 이미 자르고 있다고 가정)
+            historyRecords = Array.isArray(data) ? data : [];
+            buildDailyMap();
+            renderCalendar();
+          } catch (e) {
+            console.error("loadHistory error:", e);
+          }
+        }
+
+        function buildDailyMap() {
+          dailyMap = {};
+          for (const rec of historyRecords) {
+            const d = new Date(rec.purchased_at); // ✅ 추가 보정 없음
+            const key = formatDateKey(d);
+            if (!dailyMap[key]) {
+              dailyMap[key] = {
+                total: 0,
+                count: 0,
+                records: [],
+              };
+            }
+            dailyMap[key].total += rec.total_price || 0;
+            dailyMap[key].count += 1;
+            dailyMap[key].records.push(rec);
+          }
+        }
+
+        function renderCalendar() {
+          monthLabel.textContent = formatDateLabel(currentYear, currentMonth);
+          calendarGrid.innerHTML = "";
+
+          const firstDay = new Date(currentYear, currentMonth, 1);
+          const firstWeekday = firstDay.getDay(); // 0=Sun
+          const daysInMonth = new Date(
+            currentYear,
+            currentMonth + 1,
+            0
+          ).getDate();
+
+          let monthTotal = 0;
+          let monthCount = 0;
+
+          // 빈칸 (이전달)
+          for (let i = 0; i < firstWeekday; i++) {
+            const cell = document.createElement("div");
+            cell.className = "h-20 md:h-24 rounded-lg bg-transparent";
+            calendarGrid.appendChild(cell);
+          }
+
+          // 실제 날짜
+          for (let day = 1; day <= daysInMonth; day++) {
+            const dateObj = new Date(currentYear, currentMonth, day);
+            const key = formatDateKey(dateObj);
+            const summary = dailyMap[key];
+
+            const cell = document.createElement("div");
+            const hasSales = !!summary;
+
+            if (hasSales) {
+              monthTotal += summary.total;
+              monthCount += summary.count;
+            }
+
+            cell.className =
+              "h-20 md:h-24 rounded-lg border flex flex-col justify-between p-1 md:p-2 cursor-pointer " +
+              (hasSales
+                ? "bg-primary/10 border-primary/60 hover:bg-primary/20"
+                : "bg-gray-100/70 dark:bg-gray-800/70 border-gray-200 dark:border-gray-700 hover:bg-gray-200/80 dark:hover:bg-gray-700/80");
+
+            cell.innerHTML = `
+              <div class="flex justify-between items-center text-[11px] md:text-xs text-gray-700 dark:text-gray-100">
+                <span class="font-bold">${day}</span>
+                ${
+                  hasSales
+                    ? `<span class="text-[10px] md:text-[11px] bg-primary/80 text-white px-1.5 py-0.5 rounded-full"> ${summary.count}건 </span>`
+                    : ""
+                }
+              </div>
+              <div class="mt-1 text-[11px] md:text-xs text-right text-gray-800 dark:text-gray-50">
+                ${hasSales ? formatCurrency(summary.total) : "&nbsp;"}
+              </div>
+            `;
+
+            if (hasSales) {
+              cell.addEventListener("click", () => openDetailForDate(key));
+            }
+
+            calendarGrid.appendChild(cell);
+          }
+
+          monthSummary.textContent = `이번 달 매출: ${formatCurrency(
+            monthTotal
+          )} (${monthCount}건)`;
+        }
+
+        function changeMonth(offset) {
+          currentMonth += offset;
+          if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear -= 1;
+          } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear += 1;
+          }
+          renderCalendar();
+        }
+
+        function openDetailForDate(dateKey) {
+          const summary = dailyMap[dateKey];
+          if (!summary) return;
+
+          detailDateTitle.textContent = `${dateKey} 매출 상세 (총 ${formatCurrency(
+            summary.total
+          )}, ${summary.count}건)`;
+
+          const records = summary.records;
+
+          let html = "";
+          records.forEach((rec, idx) => {
+            const dt = new Date(rec.purchased_at); // ✅ 그대로 사용
+            const timeStr = dt.toLocaleTimeString("ko-KR", {
+              timeZone: "Asia/Seoul",
+            });
+
+            html += `
+              <div class="mb-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80">
+                <div class="flex justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
+                  <span>#${idx + 1}</span>
+                  <span>${timeStr}</span>
+                </div>
+                <div class="text-sm mb-1 font-semibold text-gray-900 dark:text-white">
+                  합계: ${formatCurrency(rec.total_price)}
+                </div>
+                <div class="text-xs text-gray-700 dark:text-gray-200 space-y-1 mt-1">
+                  ${
+                    Array.isArray(rec.items)
+                      ? rec.items
+                          .map(
+                            (it) =>
+                              `${it.name} × ${it.qty} (${formatCurrency(
+                                it.unit_price
+                              )})`
+                          )
+                          .join("<br>")
+                      : ""
+                  }
+                </div>
+              </div>
+            `;
+          });
+
+          detailContent.innerHTML = html || "<p>내역이 없습니다.</p>";
+          detailModal.classList.remove("hidden");
+        }
+
+        function closeDetail() {
+          detailModal.classList.add("hidden");
+        }
+
+        btnPrev.addEventListener("click", () => changeMonth(-1));
+        btnNext.addEventListener("click", () => changeMonth(1));
+        btnDetailClose.addEventListener("click", closeDetail);
+        detailBackdrop.addEventListener("click", closeDetail);
+
+        initCurrentMonth();
+        loadHistory();
+      });
+    </script>
+  </body>
+</html>

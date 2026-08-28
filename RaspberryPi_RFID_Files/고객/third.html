@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>결제하기 - 24H Smart Store</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#eceef1",
+                        "secondary-fixed-dim": "#b1c7f2",
+                        "on-surface": "#191c1e",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-secondary-container": "#445a7f",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "on-error": "#ffffff",
+                        "surface": "#f7f9fc",
+                        "surface-dim": "#d8dadd",
+                        "on-tertiary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "tertiary-fixed-dim": "#ffb782",
+                        "background": "#f7f9fc",
+                        "primary": "#005bb0",
+                        "on-primary-fixed": "#001b3c",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#001b3c",
+                        "on-primary-container": "#fefcff",
+                        "tertiary-container": "#b55d00",
+                        "tertiary": "#904900",
+                        "surface-container-low": "#f2f4f7",
+                        "primary-fixed": "#d6e3ff",
+                        "primary-container": "#2574d2",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00468a",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2d3133",
+                        "secondary-container": "#bcd2fd",
+                        "on-tertiary-fixed": "#301400",
+                        "outline": "#727784",
+                        "outline-variant": "#c1c6d4",
+                        "tertiary-fixed": "#ffdcc5",
+                        "secondary": "#495f84",
+                        "on-surface-variant": "#414752",
+                        "surface-variant": "#e0e3e6",
+                        "inverse-on-surface": "#eff1f4",
+                        "surface-container-high": "#e6e8eb",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d6e3ff",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#a8c8ff",
+                        "on-background": "#191c1e",
+                        "surface-bright": "#f7f9fc",
+                        "on-secondary-fixed-variant": "#31476b",
+                        "surface-tint": "#005eb4"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 40;
+        }
+
+        .bg-abstract {
+            background-color: #f7f9fc;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 91, 176, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(37, 116, 210, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(168, 200, 255, 0.03) 0%, transparent 60%);
+        }
+
+        .blurred-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+
+        #chat-window {
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #chat-window.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body class="font-body bg-abstract text-on-surface min-h-screen flex flex-col relative overflow-hidden">
+
+    <!-- 그대로 유지 -->
+    <main class="flex-grow flex items-center justify-center p-6 z-10">
+        <div class="bg-white/80 backdrop-blur-2xl w-full max-w-2xl rounded-[2.5rem] shadow-[0px_24px_48px_-12px_rgba(25,28,30,0.08)] p-10 flex flex-col gap-8 border border-white/50">
+
+            <div class="flex flex-col gap-1">
+                <h1 class="font-headline text-4xl font-extrabold tracking-tight text-on-surface">결제하기</h1>
+                <p class="text-on-surface-variant font-medium text-lg">Scanned Items</p>
+            </div>
+
+            <!-- 상품 리스트 -->
+            <div id="item-list" class="flex flex-col gap-4"></div>
+
+            <!-- 총 금액 -->
+            <div class="mt-4 pt-8 border-t-2 border-dashed border-outline-variant flex flex-col gap-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-medium text-on-surface-variant">총 결제 금액</span>
+                    
+                    <!-- ✅ 여기만 id 추가 -->
+                    <span id="total-price" class="text-5xl font-extrabold font-headline text-primary tracking-tighter">₩0</span>
+                </div>
+
+                <!-- ✅ onclick만 변경 -->
+                <button onclick="handlePayment()" class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary py-6 rounded-2xl text-2xl font-bold shadow-lg hover:opacity-90 transition-all active:scale-[0.98]">
+                    결제하기
+                </button>
+            </div>
+        </div>
+    </main>
+
+<script>
+const API_BASE_URL = "https://walton-wharfless-lanie.ngrok-free.dev";
+const LOCAL_API_URL = "http://192.168.47.80:5000";
+
+const listEl = document.getElementById("item-list");
+const totalEl = document.getElementById("total-price");
+
+let scannedItems = JSON.parse(localStorage.getItem("cartData")) || [];
+const scannedTagSet = new Set(scannedItems.map(i => i.tag_id));
+
+function render() {
+    listEl.innerHTML = "";
+    let total = 0;
+
+    const grouped = {};
+
+    scannedItems.forEach(item => {
+        const key = item.name + "_" + item.price;
+
+        if (!grouped[key]) {
+            grouped[key] = { ...item, qty: 0 };
+        }
+        grouped[key].qty++;
+    });
+
+    Object.values(grouped).forEach(item => {
+        const line = item.price * item.qty;
+        total += line;
+
+        const div = document.createElement("div");
+        div.className = "flex items-center justify-between p-4 rounded-xl bg-surface-container-low transition-colors";
+
+        div.innerHTML = `
+            <div class="flex flex-col">
+                <span class="text-xl font-semibold">${item.name}</span>
+                <span class="text-sm">${item.qty}개</span>
+            </div>
+            <span class="text-xl font-bold font-headline">₩${line.toLocaleString()}</span>
+        `;
+
+        listEl.appendChild(div);
+    });
+
+    totalEl.textContent = "₩" + total.toLocaleString();
+}
+
+async function fetchProduct(tagId) {
+    try {
+        const resp = await fetch(API_BASE_URL + "/scan", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "any"
+            },
+            body: JSON.stringify({ rfid: tagId })
+        });
+
+        if (!resp.ok) return;
+
+        const data = await resp.json();
+
+        if (data && data.product) {
+            scannedItems.push({
+                tag_id: tagId,
+                name: data.product.product_name,
+                price: parseInt(data.product.price, 10) || 0
+            });
+
+            render();
+        }
+    } catch (e) {}
+}
+
+async function pollTags() {
+    try {
+        const resp = await fetch(LOCAL_API_URL + "/tags");
+
+        if (resp.ok) {
+            const data = await resp.json();
+            const tags = data.tags || [];
+
+            for (const tagId of tags) {
+                if (tagId && !scannedTagSet.has(tagId)) {
+                    scannedTagSet.add(tagId);
+                    fetchProduct(tagId);
+                }
+            }
+        }
+    } catch (e) {}
+
+    setTimeout(pollTags, 200);
+}
+
+async function startScan() {
+    try {
+        await fetch(LOCAL_API_URL + "/scan/start", {
+            method: "POST"
+        });
+    } catch (e) {}
+
+    pollTags();
+}
+
+async function stopScan() {
+    try {
+        await fetch(LOCAL_API_URL + "/scan/stop", {
+            method: "POST"
+        });
+    } catch (e) {}
+}
+
+async function handlePayment() {
+    if (!scannedItems.length) {
+        alert("상품 없음");
+        return;
+    }
+
+    if (!confirm("결제하시겠습니까?")) return;
+
+    try {
+        const tagIds = scannedItems.map(i => i.tag_id);
+
+        const resp = await fetch(API_BASE_URL + "/checkout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "any"
+            },
+            body: JSON.stringify({
+                tag_ids: tagIds
+            })
+        });
+
+        if (!resp.ok) {
+            alert("결제 실패");
+            return;
+        }
+
+        await stopScan();
+        localStorage.removeItem("cartData");
+
+        window.location.href = "fourth.html";
+
+    } catch (e) {
+        alert("에러 발생");
+    }
+}
+
+// 실행
+render();
+//startScan();
+if (localStorage.getItem("scanActive") === "true") {
+    // 이미 second에서 스캔 시작된 상태 → 이어받기
+    pollTags();
+} else {
+    // 직접 들어온 경우 대비 (안전장치)
+    startScan();
+}
+</script>
+
+    <script src="tts.js"></script>
+</body>
+</html>

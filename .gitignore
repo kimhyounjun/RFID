@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+ENV/
+env/
+
+# Node / frontend caches
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs and runtime files
+*.log
+*.pid
+saved_chats/
+
+# IDE / editor local state
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/test.http
+
+# Xcode local user state and build output
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.moved-aside
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Archives generated during local packaging
+*.tar
+*.tar.gz
+*.tgz
