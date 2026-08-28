@@ -6,7 +6,7 @@
 ## 1. 준비물
 
 - Python 3.9 이상
-- OpenAI API 키 (예: `sk-proj-...` 형태)
+- OpenAI API 키
 
 > ⚠️ 보안을 위해 **키는 `.env` 파일에만 넣고, 코드나 깃허브에 올리지 마세요.**
 
@@ -40,10 +40,10 @@ cp .env.example .env
 `.env` 내용 예시:
 
 ```env
-OPENAI_API_KEY=sk-proj-여기에_본인_API_키
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-> 이 키는 **네가 새로 재발급 받은 키**를 사용하는 것을 기준으로 합니다.
+> 실제 키는 GitHub에 올리지 말고 로컬 `.env` 파일에만 저장하세요.
 
 ---
 
